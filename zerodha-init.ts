@@ -6,6 +6,7 @@ const requestToken = "your_request_token";
 
 const kc = new KiteConnect({ api_key: apiKey });
 
+let accessToken = '';
 async function init() {
   try {
     await generateSession();
@@ -25,6 +26,10 @@ async function generateSession() {
   }
 }
 
+async function setAccessToken() {
+  kc.setAccessToken(accessToken);
+}
+
 async function getProfile() {
   try {
     const profile = await kc.getProfile();
@@ -35,3 +40,19 @@ async function getProfile() {
 }
 // Initialize the API calls
 init();
+
+export async function placeOrder(tradingsymbol: string, quantity: number, type: 'BUY' | 'SELL') {
+  try {
+    setAccessToken();
+    const order = await kc.placeOrder("regular", {
+      exchange: 'NSE',
+      tradingsymbol,
+      transaction_type: type,
+      quantity,
+      product: 'CNC',
+      order_type: 'MARKET'
+    })
+  } catch (error) {
+    console.error(error);
+  }
+}
